@@ -1,0 +1,17 @@
+{
+  "name": "devameetReactNativeApp",
+  "displayName": "Devameet",
+  "colors": {
+    "primaryColor": "#25CBD3",
+    "greenColor": "#3BD42D",
+    "primaryColorWithOpacity": "#25CBD325",
+    "lightBlueColor": "#F0F5FF",
+    "whiteColor": "#FFFFFF",
+    "grayColor00": "#333333",
+    "grayColor01": "#DADADA",
+    "grayColor02": "#7C7786",
+    "grayColor03": "#4D4C4D",
+    "grayColor04": "#33333325",
+    "grayColor05": "#E5E5E5"
+  }
+}

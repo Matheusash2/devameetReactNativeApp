@@ -13,5 +13,10 @@
     "grayColor03": "#4D4C4D",
     "grayColor04": "#33333325",
     "grayColor05": "#E5E5E5"
+  },
+  "fonts": {
+    "fontRegular": "Biennale-Regular",
+    "fontBold": "Biennale-Bold",
+    "fontLight": "Biennale-Light"
   }
 }

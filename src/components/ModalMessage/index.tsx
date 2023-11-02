@@ -48,6 +48,9 @@ const ModalMessage = (props: IProps) => {
                 }}
               />
             )}
+            {!message.action && !message.isCancelable && (
+              <Button placeholder="Ok" onPress={() => closeModal()} />
+            )}
           </View>
         </View>
       </View>

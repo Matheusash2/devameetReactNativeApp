@@ -5,11 +5,17 @@ import * as AuthService from '../../services/AuthService';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import styles from './styles';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../routes/RootStackParams';
+import {useNavigation} from '@react-navigation/native';
 
 const Login = () => {
+  type navigationTypes = NativeStackNavigationProp<RootStackParamList, 'Login'>;
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+
+  const navigation = useNavigation<navigationTypes>();
 
   const doLogin = async () => {
     try {
@@ -18,12 +24,18 @@ const Login = () => {
         login: email,
         password: password,
       });
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log('erro', error);
       handleMessage({
         isOpen: true,
         title: 'Login Error',
-        messages: ['Erro ao efetuar o login', 'Tente novamente'],
+        messages: [
+          'Erro ao efetuar o login',
+          'Tente novamente',
+          typeof error.response.data.message == 'string'
+            ? error.response.data.message
+            : error.response.data.message[0],
+        ],
       });
     } finally {
       setLoading(false);
@@ -61,7 +73,7 @@ const Login = () => {
         <Text style={styles.textSignUp}>Não possui uma conta?</Text>
         <TouchableOpacity
           onPress={() => {
-            console.log('clicado');
+            navigation.navigate('Register');
           }}>
           <Text style={styles.textSignUpLink}>Faça seu cadastro agora!</Text>
         </TouchableOpacity>

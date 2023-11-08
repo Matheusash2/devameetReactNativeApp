@@ -8,6 +8,7 @@ import {connect} from 'react-redux';
 import {IProps} from './types';
 import Button from '../Button';
 import styles from './styles';
+import defaultStyles from '../../communStyles';
 
 const ModalMessage = (props: IProps) => {
   const {message, setMessage} = props;
@@ -18,8 +19,8 @@ const ModalMessage = (props: IProps) => {
 
   return (
     <Modal animationType="fade" transparent={true} visible={message.isOpen!!}>
-      <View style={styles.containerBackground}>
-        <View style={styles.containerModal}>
+      <View style={defaultStyles.containerBackground}>
+        <View style={defaultStyles.containerModal}>
           <View style={styles.containerTextModal}>
             {message.title && (
               <Text style={styles.titleModal}>{message.title}</Text>

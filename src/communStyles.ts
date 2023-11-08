@@ -3,7 +3,7 @@ import {colors, fonts} from '../app.json';
 
 const {height, width} = Dimensions.get('screen');
 
-const styles = StyleSheet.create({
+const defaultStyles = StyleSheet.create({
   containerBackground: {
     backgroundColor: colors.grayColor04,
     flex: 1,
@@ -29,10 +29,10 @@ const styles = StyleSheet.create({
     fontFamily: fonts.fontRegular,
     fontSize: 14,
     fontWeight: '400',
-    color: colors.primaryColor,
+    color: colors.errorColor,
     lineHeight: 21,
     marginBottom: height * 0.02,
   },
 });
 
-export default styles;
+export default defaultStyles;

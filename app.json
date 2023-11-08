@@ -12,7 +12,8 @@
     "grayColor02": "#7C7786",
     "grayColor03": "#4D4C4D",
     "grayColor04": "#33333325",
-    "grayColor05": "#E5E5E5"
+    "grayColor05": "#E5E5E5",
+    "errorColor": "#D44231"
   },
   "fonts": {
     "fontRegular": "Biennale-Regular",

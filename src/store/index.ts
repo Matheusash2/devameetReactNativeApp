@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {persistReducer, persistStore} from 'redux-persist';
+import {persistReducer} from 'redux-persist';
 import {Reducers} from './reducers';
 import {applyMiddleware, createStore} from 'redux';
 import ReduxThunk from 'redux-thunk';
+import persistStore from "redux-persist/es/persistStore";
 
 const persistConfig = {
   key: 'devaMeet',

@@ -81,6 +81,7 @@ const Register = () => {
         action: async () => {
           await AuthService.login({login: email, password: password});
           handleMessage({isOpen: false});
+          navigation.navigate('Home');
         },
       });
     } catch (error: any) {

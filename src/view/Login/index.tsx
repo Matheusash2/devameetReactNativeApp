@@ -8,22 +8,34 @@ import styles from './styles';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../routes/RootStackParams';
 import {useNavigation} from '@react-navigation/native';
+import {store} from '../../store';
 
 const Login = () => {
   type navigationTypes = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+  const navigation = useNavigation<navigationTypes>();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
-  const navigation = useNavigation<navigationTypes>();
+  useEffect(() => {
+    verifyLogged();
+  }, []);
+
+  const verifyLogged = () => {
+    if (store.getState().auth.token) {
+      navigation.navigate('Home');
+    }
+  };
 
   const doLogin = async () => {
     try {
       setLoading(true);
-      await AuthService.login({
+      const login = await AuthService.login({
         login: email,
         password: password,
       });
+      console.log(login)
+      navigation.navigate('Home');
     } catch (error: any) {
       console.log('erro', error);
       handleMessage({

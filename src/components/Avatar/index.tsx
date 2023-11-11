@@ -19,7 +19,7 @@ const Avatar = (props: IAvater) => {
         onPress={() => props.onChange && setModalVisible(!modalVisible)}
         style={styles.imageContainer}>
         <Image
-          style={[props.style, props.avatar ? styles.imageWithBorder : null]}
+          style={[props.avatar ? styles.imageWithBorder : null, props.style]}
           source={
             props.avatar
               ? avatars[`${props.avatar}_front`]

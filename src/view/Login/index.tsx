@@ -40,9 +40,9 @@ const Login = () => {
       console.log('erro', error);
       handleMessage({
         isOpen: true,
-        title: 'Login Error',
+        title: 'Login Error!',
         messages: [
-          'Erro ao efetuar o login',
+          'Erro ao efetuar login',
           'Tente novamente',
           typeof error.response.data.message == 'string'
             ? error.response.data.message

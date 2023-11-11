@@ -9,23 +9,26 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightBlueColor,
     borderTopColor: colors.primaryColor,
     borderTopWidth: 0.5,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    marginHorizontal: width *0.04
+    marginHorizontal: width * 0.04,
   },
-  iconEditProfile:{
+  iconEditProfile: {
+    
     height: height * 0.04,
     width: width * 0.08,
     borderRadius: 100,
-    borderColor: colors.grayColor03,
-    borderWidth: 2
+    borderWidth: 2,
   },
-  active:{
+  active: {
     borderColor: colors.primaryColor,
+  },
+  inactive: {
+    borderColor: colors.grayColor03,
   },
 });
 

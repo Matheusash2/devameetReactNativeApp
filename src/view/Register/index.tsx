@@ -88,7 +88,7 @@ const Register = () => {
       console.log('erro', error.response.data);
       handleMessage({
         isOpen: true,
-        title: 'Register Error',
+        title: 'Register Error!',
         messages: [
           'Erro ao efetuar cadastro',
           'Tente novamente',

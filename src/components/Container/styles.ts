@@ -5,10 +5,12 @@ const {height, width} = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: colors.whiteColor
   },
   content: {
-    flex: 1
+    flex: 1,
+    backgroundColor: colors.whiteColor
   }
 })
 

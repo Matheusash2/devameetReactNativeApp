@@ -40,7 +40,7 @@ const Login = () => {
       console.log('erro', error);
       handleMessage({
         isOpen: true,
-        title: 'Login Error!',
+        title: 'Erro!',
         messages: [
           'Erro ao efetuar login',
           'Tente novamente',

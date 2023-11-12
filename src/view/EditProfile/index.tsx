@@ -49,7 +49,7 @@ const EditProfile = () => {
       console.log('Erro no update', error);
       handleMessage({
         isOpen: true,
-        title: 'Updating Error!',
+        title: 'Erro!',
         messages: [
           'Erro ao efetuar atualização',
           'Tente novamente',

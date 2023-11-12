@@ -76,7 +76,7 @@ const Register = () => {
       await AuthService.register(body);
       handleMessage({
         isOpen: true,
-        title: 'Tudo Certo!',
+        title: 'Sucesso!',
         messages: ['Cadastro efetuado com sucesso!'],
         action: async () => {
           await AuthService.login({login: email, password: password});
@@ -88,7 +88,7 @@ const Register = () => {
       console.log('erro', error.response.data);
       handleMessage({
         isOpen: true,
-        title: 'Register Error!',
+        title: 'Erro!',
         messages: [
           'Erro ao efetuar cadastro',
           'Tente novamente',

@@ -25,7 +25,7 @@ const Item = (props: {item: IMeet, delete: () => void;}) => {
       <View style={[styles.color, {backgroundColor: props.item.color}]}></View>
       <Text style={styles.title}>{props.item.name}</Text>
       <View style={styles.containerButtons}>
-        <TouchableOpacity onPress={() => navigation.navigate('Meet')} style={styles.button}>
+        <TouchableOpacity onPress={() => navigation.navigate('Meet', {meet: props.item})} style={styles.button}>
           <Image source={require('../../../../assets/images/meetIcon.png')} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => copy()} style={styles.button}>

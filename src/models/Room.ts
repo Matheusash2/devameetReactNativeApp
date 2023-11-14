@@ -11,6 +11,6 @@ export interface IObject {
   name: string;
   x: number;
   y: number;
-  zindex: number;
+  zIndex: number;
   orientation: string;
 }

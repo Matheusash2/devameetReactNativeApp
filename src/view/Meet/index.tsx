@@ -8,6 +8,7 @@ import {useNavigation} from '@react-navigation/native';
 import * as RoomService from '../../services/RoomService';
 import handleMessage from '../../utils/message';
 import SearchRoom from '../../components/SearchRoom';
+import Room from '../../components/Room';
 
 const Meet = () => {
   type navigationTypes = NativeStackNavigationProp<RootStackParamList, 'Meet'>;
@@ -50,9 +51,7 @@ const Meet = () => {
     <Container currentTab="Meet">
       <View>
         {currentRoom ? (
-          <View>
-            <Text>Tela de room</Text>
-          </View>
+          <Room room={currentRoom}/>
         ) : (
           <SearchRoom onSearch={onSearch} loading={loading} />
         )}

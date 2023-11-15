@@ -1,4 +1,10 @@
-import {Image, ImageBackground, Text, View} from 'react-native';
+import {
+  Image,
+  ImageBackground,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {IRoom} from '../../models/Room';
 import styles from './styles';
 import RoomHeader from './RoomHeader';
@@ -7,18 +13,43 @@ import {colors, fonts} from '../../../app.json';
 import {objectsPaths, objectsPosition} from '../../utils/assets';
 import {useState} from 'react';
 import Button from '../Button';
+import Controls from './Controls';
 
 const {height, width} = Dimensions.get('screen');
 
 const Room = (props: {room: IRoom}) => {
+  const [enabledRoom, setEnabledRoom] = useState<boolean>(false);
+  const [enabledMute, setEnabledMute] = useState<boolean>(false);
+  const cellSize = Math.min(width, height) / 8;
+
+  const onEnter = () => {
+    setEnabledRoom(true);
+  };
+
+  const toggleMute = () => {
+    setEnabledMute(!enabledMute);
+  };
+
+  const onChangeControls = (command: string) => {
+    switch (command) {
+      case 'TOP':
+        console.log('TOP');
+        break;
+      case 'DOWN':
+        console.log('DOWN');
+        break;
+      case 'LEFT':
+        console.log('LEFT');
+        break;
+      case 'RIGHT':
+        console.log('RIGHT');
+        break;
+      default:
+        break;
+    }
+  };
+
   const RenderRoom = () => {
-    const [enabledRoom, setEnabledRoom] = useState<boolean>(false);
-    const cellSize = Math.min(width, height) / 8;
-
-    const onEnter = () => {
-      setEnabledRoom(true);
-    };
-
     return (
       <View style={styles.roomContainer}>
         <View style={styles.row}>
@@ -75,7 +106,17 @@ const Room = (props: {room: IRoom}) => {
             </View>
           </View>
         ) : (
-          <View></View>
+          <View style={styles.muteContainer}>
+            <TouchableOpacity onPress={() => toggleMute()} style={styles.mute}>
+              <Image
+                source={
+                  enabledMute
+                    ? require('../../assets/images/muteOn.png')
+                    : require('../../assets/images/muteOff.png')
+                }
+              />
+            </TouchableOpacity>
+          </View>
         )}
       </View>
     );
@@ -86,8 +127,24 @@ const Room = (props: {room: IRoom}) => {
       style={styles.bg}
       source={require('../../assets/images/background.png')}
       resizeMode="cover">
-      <RoomHeader room={props.room} />
-      {RenderRoom()}
+      {props.room.objects.length > 0 ? (
+        <>
+          <RoomHeader room={props.room} />
+          {RenderRoom()}
+          {enabledRoom && (
+            <Controls
+              onChange={onChangeControls}
+            />
+          )}
+        </>
+      ) : (
+        <View style={styles.emptyContainer}>
+          <View style={styles.empty}>
+            <Image source={require('../../assets/images/empty.png')} />
+            <Text style={styles.textEmpty}>Reunião não encontrada :/</Text>
+          </View>
+        </View>
+      )}
     </ImageBackground>
   );
 };

@@ -1,4 +1,10 @@
-import {Text, TouchableOpacity, View, ActivityIndicator} from 'react-native';
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+  Image,
+} from 'react-native';
 import styles from './styles';
 import {IButton} from './types';
 import {colors} from '../../../app.json';
@@ -16,7 +22,10 @@ const Button = (props: IButton) => {
       {props.loading ? (
         <ActivityIndicator size={30} color={colors.whiteColor} />
       ) : (
-        <Text style={styles.textButton}>{props.placeholder}</Text>
+        <>
+          <Text style={styles.textButton}>{props.placeholder}</Text>
+         {props.icon && <Image source={props.icon} style={props.style}/>}
+        </>
       )}
     </TouchableOpacity>
   );

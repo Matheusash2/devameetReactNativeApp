@@ -10,19 +10,46 @@ import styles from './styles';
 import RoomHeader from './RoomHeader';
 import {Dimensions} from 'react-native';
 import {colors, fonts} from '../../../app.json';
-import {objectsPaths, objectsPosition} from '../../utils/assets';
-import {useState} from 'react';
+import {avatars, objectsPaths, objectsPosition} from '../../utils/assets';
+import {useEffect, useState} from 'react';
 import Button from '../Button';
 import Controls from './Controls';
+import {
+  IUserOnMeet,
+  createPeerConnectionContext,
+} from '../../services/WebSocketService';
+import {store} from '../../store';
 
 const {height, width} = Dimensions.get('screen');
 
 const Room = (props: {room: IRoom}) => {
   const [enabledRoom, setEnabledRoom] = useState<boolean>(false);
   const [enabledMute, setEnabledMute] = useState<boolean>(false);
+  const [users, setUsers] = useState<IUserOnMeet[]>([]);
+  const [me, setMe] = useState<IUserOnMeet>();
+  const wsServices = createPeerConnectionContext();
   const cellSize = Math.min(width, height) / 8;
 
-  const onEnter = () => {
+  useEffect(() => {
+    if (users && me) {
+      console.log('users', users);
+      console.log('me', me);
+    }
+  }, [users, me]);
+
+  const join = () => {
+    const userId = store.getState().user.id;
+    const link = props.room.link;
+    wsServices.joinRoom({userId, link});
+    wsServices.onUpdateUserList((usersList: IUserOnMeet[]) => {
+      if (usersList) {
+        setUsers(usersList);
+        const me = usersList.find(
+          user => user.user === store.getState().user.id,
+        );
+        setMe(me);
+      }
+    });
     setEnabledRoom(true);
   };
 
@@ -53,11 +80,11 @@ const Room = (props: {room: IRoom}) => {
     return (
       <View style={styles.roomContainer}>
         <View style={styles.row}>
-          {[0, 1, 2, 3, 4, 5, 6, 7].map(y => (
-            <View key={y} style={{width: cellSize, height: cellSize}}>
-              {[0, 1, 2, 3, 4, 5, 6, 7].map(x => (
+          {[0, 1, 2, 3, 4, 5, 6, 7].map(x => (
+            <View key={x} style={{width: cellSize, height: cellSize}}>
+              {[0, 1, 2, 3, 4, 5, 6, 7].map(y => (
                 <View
-                  key={x}
+                  key={y}
                   style={{
                     width: cellSize,
                     height: cellSize,
@@ -85,6 +112,23 @@ const Room = (props: {room: IRoom}) => {
                         }
                       />
                     ))}
+                  {users
+                    ?.filter(user => user.x === x && user.y === y)
+                    .map(user => (
+                      <Image
+                        style={{
+                          position: 'absolute',
+                          transform: objectsPosition['avatar'].scale,
+                          left: objectsPosition['avatar'].left,
+                          top: objectsPosition['avatar'].top,
+                          zIndex: 999,
+                        }}
+                        key={user._id}
+                        source={
+                          avatars[ `${user.avatar}_${user.orientation}`]
+                        }
+                      />
+                    ))}
                 </View>
               ))}
             </View>
@@ -99,7 +143,7 @@ const Room = (props: {room: IRoom}) => {
               />
               <Button
                 placeholder="Entrar na sala"
-                onPress={() => onEnter()}
+                onPress={() => join()}
                 style={styles.button}
                 loading={enabledRoom}
               />
@@ -131,11 +175,7 @@ const Room = (props: {room: IRoom}) => {
         <>
           <RoomHeader room={props.room} />
           {RenderRoom()}
-          {enabledRoom && (
-            <Controls
-              onChange={onChangeControls}
-            />
-          )}
+          {enabledRoom && <Controls onChange={onChangeControls} />}
         </>
       ) : (
         <View style={styles.emptyContainer}>

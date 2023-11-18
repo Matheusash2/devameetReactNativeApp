@@ -20,6 +20,12 @@ export interface IUserOnMeet {
   muted: boolean;
 }
 
+export interface IMove {
+  x?: number;
+  y?: number;
+  orientation?: string;
+}
+
 class PeerConnectionSession {
   socket: Socket<DefaultEventsMap, DefaultEventsMap>;
   _link: string = '';
@@ -35,6 +41,9 @@ class PeerConnectionSession {
     this.socket.emit('join', data);
     console.log('data ', data);
   }
+  updateUserMoviment(data: IMove) {
+    this.socket.emit('move', {link: this._link, userId: this._userId, ...data});
+  }
 
   onUpdateUserList(callback: (users: IUserOnMeet[]) => void) {
     this.socket.on(
@@ -44,6 +53,14 @@ class PeerConnectionSession {
         console.log('users', users);
       },
     );
+  }
+
+  updateToggleMute(muted: boolean) {
+    this.socket.emit('toggl-mute-user', {
+      link: this._link,
+      userId: this._userId,
+      muted,
+    });
   }
 }
 

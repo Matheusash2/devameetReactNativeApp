@@ -15,6 +15,7 @@ import {useEffect, useState} from 'react';
 import Button from '../Button';
 import Controls from './Controls';
 import {
+  IMove,
   IUserOnMeet,
   createPeerConnectionContext,
 } from '../../services/WebSocketService';
@@ -24,20 +25,15 @@ const {height, width} = Dimensions.get('screen');
 
 const Room = (props: {room: IRoom}) => {
   const [enabledRoom, setEnabledRoom] = useState<boolean>(false);
-  const [enabledMute, setEnabledMute] = useState<boolean>(false);
+  const [isMute, setIsMute] = useState<boolean>(false);
   const [users, setUsers] = useState<IUserOnMeet[]>([]);
   const [me, setMe] = useState<IUserOnMeet>();
-  const wsServices = createPeerConnectionContext();
+  const [ws, setWs] = useState<any>();
   const cellSize = Math.min(width, height) / 8;
 
-  useEffect(() => {
-    if (users && me) {
-      console.log('users', users);
-      console.log('me', me);
-    }
-  }, [users, me]);
-
   const join = () => {
+    const wsServices = createPeerConnectionContext();
+    setWs(wsServices);
     const userId = store.getState().user.id;
     const link = props.room.link;
     wsServices.joinRoom({userId, link});
@@ -54,26 +50,53 @@ const Room = (props: {room: IRoom}) => {
   };
 
   const toggleMute = () => {
-    setEnabledMute(!enabledMute);
+    ws.updateToggleMute(!isMute);
+    setIsMute(!isMute);
   };
 
   const onChangeControls = (command: string) => {
+    let data: IMove = {};
+
     switch (command) {
       case 'TOP':
-        console.log('TOP');
+        data.x = me!!.x;
+        data.orientation = 'back';
+        if (me?.orientation == 'back') {
+          data.y = me.y > 1 ? me.y - 1 : 1;
+        } else {
+          data.y = me!!.y;
+        }
         break;
       case 'DOWN':
-        console.log('DOWN');
+        data.x = me!!.x;
+        data.orientation = 'front';
+        if (me?.orientation == 'front') {
+          data.y = me.y < 7 ? me.y + 1 : 7;
+        } else {
+          data.y = me!!.y;
+        }
         break;
       case 'LEFT':
-        console.log('LEFT');
+        data.y = me!!.y;
+        data.orientation = 'left';
+        if (me?.orientation == 'left') {
+          data.x = me.x > 0 ? me.x - 1 : 0;
+        } else {
+          data.x = me!!.x;
+        }
         break;
       case 'RIGHT':
-        console.log('RIGHT');
-        break;
-      default:
+        data.y = me!!.y;
+        data.orientation = 'right';
+        if (me?.orientation == 'right') {
+          data.x = me.x < 7 ? me.x + 1 : 7;
+        } else {
+          data.x = me!!.x;
+        }
         break;
     }
+
+    ws.updateUserMoviment(data);
   };
 
   const RenderRoom = () => {
@@ -115,19 +138,21 @@ const Room = (props: {room: IRoom}) => {
                   {users
                     ?.filter(user => user.x === x && user.y === y)
                     .map(user => (
-                      <Image
-                        style={{
-                          position: 'absolute',
-                          transform: objectsPosition['avatar'].scale,
-                          left: objectsPosition['avatar'].left,
-                          top: objectsPosition['avatar'].top,
-                          zIndex: 999,
-                        }}
-                        key={user._id}
-                        source={
-                          avatars[ `${user.avatar}_${user.orientation}`]
-                        }
-                      />
+                      <View key={user._id} style={styles.avatarContainer}>
+                        <View style={styles.avatarNameContainer}>
+                          <Text style={styles.avatarName}>{user.name}</Text>
+                        </View>
+                        <Image
+                          style={{
+                            position: 'absolute',
+                            transform: objectsPosition['avatar'].scale,
+                            left: objectsPosition['avatar'].left,
+                            top: objectsPosition['avatar'].top,
+                            zIndex: 999,
+                          }}
+                          source={avatars[`${user.avatar}_${user.orientation}`]}
+                        />
+                      </View>
                     ))}
                 </View>
               ))}
@@ -154,7 +179,7 @@ const Room = (props: {room: IRoom}) => {
             <TouchableOpacity onPress={() => toggleMute()} style={styles.mute}>
               <Image
                 source={
-                  enabledMute
+                  isMute
                     ? require('../../assets/images/muteOn.png')
                     : require('../../assets/images/muteOff.png')
                 }

@@ -73,8 +73,28 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
   },
-  mute: {
-    
+  mute: {},
+  avatarContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarNameContainer: {
+    minWidth: width * 0.2,
+    height: height * 0.015,
+    backgroundColor: colors.grayColor00WithOpacity75,
+    borderColor: colors.lightBlueColor,
+    borderWidth: 1,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 999,
+    bottom: 15,
+  },
+  avatarName: {
+    fontFamily: fonts.fontBold,
+    fontSize: 8,
+    fontWeight: '500',
+    color: colors.lightBlueColor,
   },
 });
 

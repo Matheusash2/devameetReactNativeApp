@@ -11,7 +11,7 @@ import RoomHeader from './RoomHeader';
 import {Dimensions} from 'react-native';
 import {colors, fonts} from '../../../app.json';
 import {avatars, objectsPaths, objectsPosition} from '../../utils/assets';
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import Button from '../Button';
 import Controls from './Controls';
 import {
@@ -20,39 +20,109 @@ import {
   createPeerConnectionContext,
 } from '../../services/WebSocketService';
 import {store} from '../../store';
+import {mediaDevices} from 'react-native-webrtc';
+import InCallManager from 'react-native-incall-manager';
 
 const {height, width} = Dimensions.get('screen');
 
 const Room = (props: {room: IRoom}) => {
   const [enabledRoom, setEnabledRoom] = useState<boolean>(false);
   const [isMute, setIsMute] = useState<boolean>(false);
-  const [users, setUsers] = useState<IUserOnMeet[]>([]);
   const [me, setMe] = useState<IUserOnMeet>();
   const [ws, setWs] = useState<any>();
+  const [localStream, setLocalStream] = useState<any>(null);
+  const [usersStream, setUsersStream] = useState<any[]>([]);
+  
+  const users = useRef<IUserOnMeet[]>([]);
+  const userRef = useRef<IUserOnMeet>();
+  const newUsersStreams = useRef<any[]>([]);
+
   const cellSize = Math.min(width, height) / 8;
 
-  const join = () => {
-    const wsServices = createPeerConnectionContext();
-    setWs(wsServices);
-    const userId = store.getState().user.id;
-    const link = props.room.link;
-    wsServices.joinRoom({userId, link});
-    wsServices.onUpdateUserList((usersList: IUserOnMeet[]) => {
-      if (usersList) {
-        setUsers(usersList);
-        const me = usersList.find(
-          user => user.user === store.getState().user.id,
-        );
-        setMe(me);
-      }
-    });
-    setEnabledRoom(true);
-  };
+  useEffect(() => {
+    if (!localStream) {
+        (async () => {
+            let mediaConstraints = {
+                audio: true,
+                video: {
+                    frameRate: 30,
+                    facingMode: 'user'
+                }
+            };
 
-  const toggleMute = () => {
-    ws.updateToggleMute(!isMute);
-    setIsMute(!isMute);
-  };
+            const mediaStream = await mediaDevices.getUserMedia(mediaConstraints)
+            let videoTrack = await mediaStream.getVideoTracks()[0];
+            videoTrack.enabled = false;
+
+            setLocalStream(mediaStream)  
+        })()
+    }
+
+    return () => {
+        InCallManager.stop()
+    }
+}, [])
+
+const join = () => {
+    InCallManager.start()
+    InCallManager.setKeepScreenOn(true)
+    InCallManager.setForceSpeakerphoneOn(true)
+
+    const wsServices = createPeerConnectionContext()
+    setWs(wsServices)
+    const userId = store.getState().user.id
+    wsServices.joinRoom({ userId, link: props.room.link })
+    wsServices.onCallMade()
+    wsServices.onUpdateUserList((userList: IUserOnMeet[]) => {
+        if (userList) {
+            users.current = userList
+            const me = userList.find(user => user.user === store.getState().user.id)
+            setMe(me)
+            setIsMute(me?.muted!!)
+
+            const usersWithOutMe = userList.filter(user => user.user !== me!!.user)
+
+            usersWithOutMe.forEach(async user => {
+                userRef.current = user
+                newUsersStreams.current = usersStream
+
+                wsServices.addPeerConnection(user.clientId, localStream, async (_stream: any) => {
+                    newUsersStreams.current.push({ ...userRef.current, stream: _stream })
+                })
+
+                let audioTrack = await newUsersStreams.current.find((userStream: any) => userStream.clientId == userRef!!.current!!.clientId)?.stream.getAudioTracks()[0]
+                if (audioTrack) {
+                    audioTrack.enabled = !userRef.current.muted
+                }
+            })
+            setUsersStream(newUsersStreams.current)
+        }
+    })
+
+    wsServices.onRemoveUser((socketId: string) => {
+        const newUsersConnecteed = users.current.filter(user => user.clientId !== socketId)
+        const newUsersStreamConnecteed = usersStream.filter(user => user.clientId !== socketId)
+        users.current = newUsersConnecteed
+        setLocalStream(newUsersStreamConnecteed)
+
+        wsServices.removePeerConnection(socketId)
+    })
+
+    wsServices.onAddUser((clientId: string) => {
+        wsServices.callUser(clientId)
+    })
+
+    wsServices.onAnswerMade((clientId: string) => {
+        wsServices.callUser(clientId)
+    })
+
+    setEnabledRoom(true)
+}
+
+const toggleMute = () => {
+    ws.updateUserMute(!isMute)
+    setIsMute(!isMute)
+}
 
   const onChangeControls = (command: string) => {
     let data: IMove = {};
@@ -96,7 +166,7 @@ const Room = (props: {room: IRoom}) => {
         break;
     }
 
-    ws.updateUserMoviment(data);
+    ws.updateUserMovement(data);
   };
 
   const RenderRoom = () => {
@@ -135,7 +205,7 @@ const Room = (props: {room: IRoom}) => {
                         }
                       />
                     ))}
-                  {users
+                  {users.current
                     ?.filter(user => user.x === x && user.y === y)
                     .map(user => (
                       <View key={user._id} style={styles.avatarContainer}>
